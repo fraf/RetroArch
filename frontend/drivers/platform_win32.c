@@ -884,7 +884,7 @@ static bool create_win32_process(char* cmd)
 
 ISpVoice* pVoice = NULL;
 bool USE_POWERSHELL = false;
-bool USE_NVDA = true;
+bool USE_NVDA = false;
 bool USE_NVDA_BRAILLE = false;
 
 static bool is_narrator_running_windows(void)
