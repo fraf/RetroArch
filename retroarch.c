@@ -6286,10 +6286,6 @@ static void handle_translation_cb(
       i++;
    }
 
-   /*
-   if (auto_string != NULL)
-      RARCH_LOG("auto_string %s\n", auto_string);
-   */
    if (string_is_equal(error_string, "No text found."))
    {
 #ifdef DEBUG
