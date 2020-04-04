@@ -3264,10 +3264,6 @@ static enum menu_action ozone_parse_menu_entry_action(
             ozone_show_fullscreen_thumbnails(ozone);
             new_action = MENU_ACTION_NOOP;
          }
-         /*
-         if (ozone->cursor_in_sidebar)
-            new_action = MENU_ACTION_ACCESSIBILITY_SPEAK_TITLE;
-         */
          break;
       case MENU_ACTION_DOWN:
          if (ozone->cursor_in_sidebar)
