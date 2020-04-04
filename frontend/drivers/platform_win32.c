@@ -884,7 +884,7 @@ static bool create_win32_process(char* cmd)
 
 ISpVoice* pVoice = NULL;
 bool USE_POWERSHELL = false;
-bool USE_NVDA = false;
+bool USE_NVDA = true;
 bool USE_NVDA_BRAILLE = false;
 
 static bool is_narrator_running_windows(void)
@@ -977,6 +977,10 @@ static bool accessibility_speak_windows(int speed,
    else if (USE_NVDA)
    {
       long res=nvdaController_testIfRunning();
+      const size_t cSize = strlen(speak_text)+1;
+      wchar_t* wc = malloc(sizeof(wchar_t)*cSize);
+      mbstowcs(wc, speak_text, cSize);
+
       if(res!=0) 
       {
          RARCH_LOG("Error communicating with NVDA\n");
@@ -988,9 +992,11 @@ static bool accessibility_speak_windows(int speed,
       }
 
       if (USE_NVDA_BRAILLE)
-         nvdaController_brailleMessage((wchar_t*) speak_text);
+         nvdaController_brailleMessage(wc);
       else
-         nvdaController_speakText((wchar_t *) speak_text);
+      {
+         nvdaController_speakText(wc);
+      }
       return true;
    }
 #endif
