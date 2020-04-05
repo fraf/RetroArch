@@ -882,22 +882,24 @@ static bool create_win32_process(char* cmd)
 #include <sapi.h>
 #include <ole2.h>
 
-ISpVoice* pVoice = NULL;
-bool USE_POWERSHELL = false;
-bool USE_NVDA = true;
+static ISpVoice* pVoice = NULL;
+bool USE_POWERSHELL = true;
+bool USE_NVDA = false;
 bool USE_NVDA_BRAILLE = false;
 
 static bool is_narrator_running_windows(void)
 {
    DWORD status = 0;
    bool res;
-
    if (USE_POWERSHELL)
    {
       if (pi_set == false)
          return false;
-      if (GetExitCodeProcess(&g_pi, &status) && status == STILL_ACTIVE)
-         return true;
+      if (GetExitCodeProcess(g_pi.hProcess, &status))
+      {
+         if (status == STILL_ACTIVE)
+            return true;
+      }
       return false;
    }
 #ifdef HAVE_NVDA
@@ -909,7 +911,7 @@ static bool is_narrator_running_windows(void)
          RARCH_LOG("Error communicating with NVDA\n");
 	 return false;
       }
-      return true;
+      return false;
       /*
       nvdaController_speakText(L"This is a test speech message");
       nvdaController_brailleMessage(L"This is a test braille message");
@@ -1003,9 +1005,11 @@ static bool accessibility_speak_windows(int speed,
    else
    {
       /* stop the old voice if running */
-      CoUninitialize();
       if (pVoice != NULL)
+      {
+         CoUninitialize();
          ISpVoice_Release(pVoice);
+      }
       pVoice = NULL;
 
       /* Play the new voice */
@@ -1018,9 +1022,9 @@ static bool accessibility_speak_windows(int speed,
          wchar_t wtext[1200];
          snprintf(cmd, sizeof(cmd),
                   "<rate speed=\"%s\"/><volume level=\"80\"/><lang langid=\"%s\"/>%s", speeds[speed], langid, speak_text);
-         mbstowcs(wtext, cmd, strlen(cmd)+1);
-
-         hr = ISpVoice_Speak(pVoice, (LPWSTR) wtext, SPF_ASYNC /*SVSFlagsAsync*/, NULL);
+         mbstowcs(wtext, speak_text, sizeof(wtext));
+ 
+         hr = ISpVoice_Speak(pVoice, wtext, SPF_ASYNC /*SVSFlagsAsync*/, NULL);
       }
       return true;
    }
