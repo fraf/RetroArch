@@ -883,8 +883,13 @@ static bool create_win32_process(char* cmd)
 #include <ole2.h>
 
 static ISpVoice* pVoice = NULL;
+#ifdef HAVE_NVDA
+bool USE_POWERSHELL = false;
+bool USE_NVDA = true;
+#else
 bool USE_POWERSHELL = true;
 bool USE_NVDA = false;
+#endif
 bool USE_NVDA_BRAILLE = false;
 
 static bool is_narrator_running_windows(void)
@@ -908,7 +913,12 @@ static bool is_narrator_running_windows(void)
       long res=nvdaController_testIfRunning();
       if(res!=0) 
       {
+         /* The running nvda service wasn't found, so revert
+            back to the powershell method
+         */
          RARCH_LOG("Error communicating with NVDA\n");
+         USE_POWERSHELL = true;
+         USE_NVDA = false;
 	 return false;
       }
       return false;
