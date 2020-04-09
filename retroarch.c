@@ -6163,8 +6163,8 @@ static void handle_translation_cb(
    bool was_paused                   = runloop_paused;
 
 
-#ifdef HAVE_MENU_WIDGETS
-   if (menu_widgets_ai_service_overlay_get_state() != 0 
+#ifdef GFX_MENU_WIDGETS
+   if (gfx_widgets_ai_service_overlay_get_state() != 0 
        && get_ai_service_auto() == 2)
    {
       /* When auto mode is on, we turn off the overlay
@@ -6180,10 +6180,7 @@ static void handle_translation_cb(
 
    if (!data || error)
       goto finish;
-
-  if (get_ai_service_auto() == 0)
-    goto finish;
-
+   
    data->data = (char*)realloc(data->data, data->len + 1);
    if (!data->data)
       goto finish;
@@ -6609,6 +6606,7 @@ static void handle_translation_cb(
    }
 
 #ifdef HAVE_ACCESSIBILITY
+   RARCH_LOG("ADD %s %d\n", text_string, is_accessibility_enabled());
    if (text_string && is_accessibility_enabled())
       accessibility_speak_priority(text_string, 10);
 #endif
@@ -6868,7 +6866,7 @@ static bool run_translation_service(bool paused)
    core_info_t *core_info                = NULL;
 
 #ifdef HAVE_GFX_WIDGETS
-   if (gfx_widgets_ai_service_overlay_get_state() != 0 && get_ai_service_auto() == 0)
+   if (gfx_widgets_ai_service_overlay_get_state() != 0 && get_ai_service_auto() == 1)
    {
       /* For the case when ai service pause is disabled. */
       gfx_widgets_ai_service_overlay_unload();
