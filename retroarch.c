@@ -6606,7 +6606,6 @@ static void handle_translation_cb(
    }
 
 #ifdef HAVE_ACCESSIBILITY
-   RARCH_LOG("ADD %s %d\n", text_string, is_accessibility_enabled());
    if (text_string && is_accessibility_enabled())
       accessibility_speak_priority(text_string, 10);
 #endif
@@ -8456,7 +8455,11 @@ bool command_event(enum event_command cmd, void *data)
          settings_t *settings      = configuration_settings;
          bool ai_service_pause     = settings->bools.ai_service_pause;
 
-         if (ai_service_pause)
+         if (!settings->bools.ai_service_enable)
+         {
+            break;
+         }
+         else if (ai_service_pause)
          {
             /* pause on call, unpause on second press. */
             if (!runloop_paused)
@@ -29459,13 +29462,16 @@ static enum runloop_state runloop_check_state(retro_time_t current_time)
    {
       input_keys_pressed(&current_bits, &joypad_info);
 #ifdef HAVE_TRANSLATE
-      reset_gamepad_input_override();
-
-      for (int i=0;i<16;i++)
+      if (settings->bools.ai_service_enable)
       {
-         if (ai_gamepad_state[i] == 2)
-            set_gamepad_input_override(i, true);
-         ai_gamepad_state[i] = 0;
+         reset_gamepad_input_override();
+      
+         for (int i=0;i<16;i++)
+         {
+            if (ai_gamepad_state[i] == 2)
+               set_gamepad_input_override(i, true);
+            ai_gamepad_state[i] = 0;
+         }
       }      
 #endif
    }
